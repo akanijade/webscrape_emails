@@ -1,3 +1,4 @@
+from email import header
 import re
 import requests
 from urllib.parse import urlsplit
@@ -6,6 +7,11 @@ from bs4 import BeautifulSoup
 import pandas as pd
 # from google.colab import files
 
+# headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36"}
+# URL='https://google.com/search?q=' + sear
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:65.0) Gecko/20100101 Firefox/65.0"
+headers = {"user-agent": USER_AGENT} # adding the user agent
+# resp = requests.get(URL, headers=headers)
 original_url = input("Enter the website url: ") 
 
 unscraped = deque([original_url])  
@@ -28,12 +34,14 @@ while len(unscraped):
 
     print("Crawling URL %s" % url)
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
     except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError):
         continue
 
     new_emails = set(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.com", response.text, re.I))
     emails.update(new_emails) 
+    print(response.text)
+
 
     soup = BeautifulSoup(response.text, 'lxml')
 
